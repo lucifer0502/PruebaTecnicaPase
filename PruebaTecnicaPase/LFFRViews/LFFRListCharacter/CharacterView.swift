@@ -32,7 +32,7 @@ struct CharacterView: View {
                 // MARK: - Character list
                 if viewModel.charactersArray.isEmpty {
                     VStack(spacing: 20) {
-                        Image("morty")       
+                        Image("morty")
                             .resizable()
                             .scaledToFit()
                             .frame(width: 100, height: 100)
@@ -59,7 +59,7 @@ struct CharacterView: View {
                                         .clipShape(Circle())
                                 } placeholder: {
                                     LoadingView()
-                                   
+                                    
                                 }
                                 
                                 VStack(alignment: .leading) {
@@ -111,13 +111,7 @@ struct CharacterView: View {
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
-                        BiometricAuthenticator.authenticateUser { success in
-                            if success {
-                                showFavoriteList.toggle()
-                            } else {
-                                print("No se pudo autenticar")
-                            }
-                        }
+                        viewModel.userAuthenticator()
                     } label: {
                         Image(systemName: "heart")
                             .imageScale(.large)
@@ -129,9 +123,8 @@ struct CharacterView: View {
             .sheet(isPresented: $showFilters) {
                 FiltersModalView(viewModel: viewModel)
             }
-            .sheet(isPresented: $showFavoriteList) {
+            .sheet(isPresented: $viewModel.showFavoriteList) {
                 FavoriteView()
-                
             }
             .navigationDestination(for: DestinationEnum.self) { destination in
                 navigationManager.destination(for: destination)

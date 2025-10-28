@@ -15,6 +15,8 @@ final class CharacterViewModel: ObservableObject {
     @Published var errorMessage: String = ""
     @Published var showErrorAlert: Bool = false
     @Published var currentPage: Int = 1
+    @Published var showFavoriteList = false
+
     
     // MARK: - Filters
     @Published var searchQuery: String = ""
@@ -59,4 +61,15 @@ final class CharacterViewModel: ObservableObject {
         selectedStatus = nil
         selectedSpecies = nil
     }
+    
+    func userAuthenticator(){
+            BiometricAuthenticator.authenticateUser { success in
+                if success {
+                    self.showFavoriteList.toggle()
+                } else {
+                    self.errorMessage = "Ocurrio un error al autenticar"
+                    self.showErrorAlert = true
+                }
+            }
+        }
 }
