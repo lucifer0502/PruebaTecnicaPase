@@ -54,17 +54,13 @@ struct FiltersModalView: View {
                 }
                 
                 // MARK: - Botón Aplicar filtros
-                Button {
-                    viewModel.fetchCharacters()
+                ButtonGeneric(
+                    label: "Aplicar filtros",
+                    icon: "slider.horizontal.3",
+                    isSelected: false
+                ) {
+                    viewModel.fetchCharacters(reset: true)
                     dismiss()
-                } label: {
-                    Text("Aplicar filtros")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
                 }
                 .padding()
             }

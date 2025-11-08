@@ -4,7 +4,9 @@
 //
 //  Created by Fernando Flores on 23/10/25.
 //
+
 import SwiftUI
+
 
 struct DetailCharacter: View {
     
@@ -15,15 +17,14 @@ struct DetailCharacter: View {
         ScrollView {
             VStack(alignment: .center, spacing: 20) {
                 
-                if let character = navigationManager.selectedCharacter,
-                   let imageUrl = character.image, !imageUrl.isEmpty {
+                if let imageUrl = navigationManager.selectedCharacter?.image, !imageUrl.isEmpty {
                     AsyncImageView(url: imageUrl)
                         .frame(height: 280)
                         .cornerRadius(15)
                         .clipped()
                 }
                 
-                Text(navigationManager.selectedCharacter?.name ?? "")
+                Text(navigationManager.selectedCharacter?.name ?? "Desconocido")
                     .font(.title)
                     .bold()
                     .multilineTextAlignment(.center)
@@ -34,14 +35,15 @@ struct DetailCharacter: View {
                         Text(navigationManager.selectedCharacter?.species ?? "")
                     }
                     
-                    Text(navigationManager.selectedCharacter?.status  ?? "")
-                        .foregroundColor(navigationManager.selectedCharacter?.status?.lowercased()  == "alive" ? .green : .red)
+                    Text(navigationManager.selectedCharacter?.status ?? "")
+                        .foregroundColor(
+                            navigationManager.selectedCharacter?.status?.lowercased() == "alive" ? .green : .red
+                        )
                     
                     Text(navigationManager.selectedCharacter?.location?.name ?? "")
                         .foregroundColor(.secondary)
                 }
                 .frame(maxWidth: .infinity)
-                
                 
                 ButtonGeneric(
                     label: "Favorito",
@@ -62,44 +64,53 @@ struct DetailCharacter: View {
                     ForEach(viewModel.episodesArray) { episode in
                         HStack {
                             VStack(alignment: .leading) {
-                                Text(episode.name ?? "Desconocido")
+                                Text(episode.name ?? "")
                                     .font(.subheadline)
                                 Text(episode.episode ?? "")
                                     .font(.caption)
                                     .foregroundColor(.gray)
                             }
+                            
                             Spacer()
-                            Image(systemName: "eye")
-                                .foregroundColor(.gray)
+                            
+                            Button {
+                                viewModel.toggleEpisodes(for: episode)
+                            } label: {
+                                Image(systemName: viewModel.isEpisodeWatched(episode.id ?? 0) ? "eye.fill": "eye")
+                            }
                         }
-                        .padding(.vertical, 4)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 
-                Button(action: {
+                ButtonGeneric(
+                    label: "Ver en mapa",
+                    icon: "map.fill",
+                    isSelected: false
+                ) {
                     navigationManager.navigate(to: .MapsView)
-                }) {
-                    Text("Ver en mapa")
-                        .foregroundColor(.white)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.green)
-                        .cornerRadius(20)
                 }
                 
                 Spacer()
             }
             .padding()
         }
-        
         .onAppear {
             if let character = navigationManager.selectedCharacter,
-               let id = character.id {
+               let id = character.id{
                 viewModel.fetchEpisodes(for: character)
                 viewModel.fetchFavorites(for: id)
-                
+                viewModel.fetchEpisodesWatched()
             }
+        }
+        
+        .alert(isPresented: $viewModel.showErrorAlert){
+            Alert(
+                title: Text("Error"),
+                message: Text(viewModel.errorMessage),
+                dismissButton: .default(Text("Aceptar"))
+                
+            )
         }
     }
 }

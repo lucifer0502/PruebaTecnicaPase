@@ -68,27 +68,13 @@ final class CoreDataManager {
         }
     }
     
-    // MARK: - Eliminar todos los objetos de un tipo
-    func deleteAll<T>(_ type: T.Type) {
-        let request: NSFetchRequest<NSFetchRequestResult> = FavoriteCharacter.fetchRequest()
-        request.predicate = NSPredicate(format: "type == %@", String(describing: T.self))
-        
-        let deleteRequest = NSBatchDeleteRequest(fetchRequest: request)
-        do {
-            try context.execute(deleteRequest)
-            try context.save()
-            print("Todos los \(T.self) eliminados")
-        } catch {
-            print("Error al eliminar \(T.self): \(error)")
-        }
-    }
-    
     // MARK: - Eliminar un personaje por id
-    func delete<T: Identifiable>(_ type: T.Type, id: String) {
+    func delete<T: Identifiable>(_ type: T.Type, id: String) throws {
         let request = NSFetchRequest<NSFetchRequestResult>(entityName: "FavoriteCharacter")
         request.predicate = NSPredicate(format: "id == %@", id)
         
         do {
+            
             if let result = try context.fetch(request).first as? NSManagedObject {
                 context.delete(result)
                 try context.save()
@@ -98,6 +84,7 @@ final class CoreDataManager {
             }
         } catch {
             print("Error al eliminar \(T.self): \(error)")
+            throw error
         }
     }
     

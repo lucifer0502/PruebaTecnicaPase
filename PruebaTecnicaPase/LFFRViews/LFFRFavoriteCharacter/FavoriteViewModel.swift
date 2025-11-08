@@ -12,6 +12,9 @@ final class FavoriteViewModel: ObservableObject{
     
     @Published var favorites: [CharacterData] = []
     
+    @Published var errorMessage: String = ""
+    @Published var showErrorAlert: Bool = false
+    
     func fetchFavorites() {
         let savedCharacters: [CharacterData] = CoreDataManager.shared.fetchAll(CharacterData.self)
         favorites = savedCharacters
@@ -19,12 +22,19 @@ final class FavoriteViewModel: ObservableObject{
     }
     
     func deleteFavorite(character: CharacterData) {
-        if let index = favorites.firstIndex(where: { $0.id == character.id }) {
-            favorites.remove(at: index)
-        }
-        
         guard let id = character.id else { return }
-        CoreDataManager.shared.delete(CharacterData.self, id: "\(id)")
+        
+        do {
+            try CoreDataManager.shared.delete(CharacterData.self, id: "\(id)")
+            
+            if let index = favorites.firstIndex(where: { $0.id == character.id }) {
+                favorites.remove(at: index)
+            }
+            
+        } catch {
+            self.errorMessage = "No se pudo eliminar el favorito: \(error.localizedDescription)"
+            self.showErrorAlert = true
+        }
     }
 }
 

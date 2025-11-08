@@ -65,6 +65,11 @@ struct FavoriteView: View {
             .onAppear {
                 favoriteViewModel.fetchFavorites()
             }
+            .alert(isPresented: $favoriteViewModel.showErrorAlert) {
+                Alert(title: Text("Error"),
+                      message: Text(favoriteViewModel.errorMessage),
+                      dismissButton: .default(Text("OK")))
+            }
         }
     }
 }

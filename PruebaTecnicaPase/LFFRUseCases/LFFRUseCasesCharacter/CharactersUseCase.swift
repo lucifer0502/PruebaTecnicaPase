@@ -19,15 +19,18 @@ internal final class CharactersUseCase: CharactersUseCaseProtocol {
     }
     
     func getCharacters(page: Int, name: String?, status: String?, species: String?) async throws -> [CharacterData] {
-        
-        let filter = CharacterFilter(name: name, status: status, species: species)
-        
-        let response = try await charactersRepository.getCharacters(page: page, filter: filter)
-        
-        guard let charactersArray = response.results else {
-            throw GenericError(codigo: "", error: "No se encontraron personajes")
+            
+            let filter = CharacterFilter(name: name, status: status, species: species)
+            
+            let response = try await charactersRepository.getCharacters(page: page, filter: filter)
+            
+            guard let charactersArray = response.results,
+                  let pages = response.info?.pages else {
+                throw GenericError(codigo: "", error: "No se encontraron personajes")
+            }
+            Constant.pages = pages
+            return charactersArray
         }
-        
-        return charactersArray
-    }
+
 }
+

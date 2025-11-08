@@ -13,10 +13,7 @@ struct CharacterView: View {
     
     @StateObject var viewModel = CharacterViewModel()
     @StateObject var navigationManager = NavigationManger()
-    @StateObject var FavoriteviewModel = FavoriteViewModel()
-    
     @State private var showFilters = false
-    @State private var showFavoriteList = false
     
     var body: some View {
         NavigationStack(path: $navigationManager.path) {
@@ -26,7 +23,7 @@ struct CharacterView: View {
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding(.horizontal)
                     .onSubmit {
-                        viewModel.fetchCharacters()
+                        viewModel.resetAllAndFetch(refreshable: false)
                     }
                 
                 // MARK: - Character list
@@ -80,10 +77,13 @@ struct CharacterView: View {
                             .padding(.vertical, 5)
                         }
                         .buttonStyle(PlainButtonStyle())
+                        .onAppear{
+                            viewModel.loadMoreIfNeeded(currentItem: character)
+                        }
                     }
                     .listStyle(.plain)
                     .refreshable {
-                        viewModel.fetchCharacters()
+                        viewModel.resetAllAndFetch(refreshable: true)
                     }
                     
                     if viewModel.isLoading {
@@ -96,8 +96,10 @@ struct CharacterView: View {
             .navigationTitle("Personajes")
             .onAppear {
                 if viewModel.charactersArray.isEmpty {
-                    viewModel.fetchCharacters()
+                    viewModel.fetchCharacters(reset: true)
+                    
                 }
+                
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {

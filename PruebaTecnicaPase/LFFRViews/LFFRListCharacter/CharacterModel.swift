@@ -51,5 +51,4 @@ struct EpisodeData: Codable, Identifiable {
     let id: Int?
     let name: String?
     let episode: String?
-    let air_date: String?
 }
